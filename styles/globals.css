@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 26, 26, 26;
+  --background-end-rgb: 0, 0, 0;
+  --djx-yellow: #FFCF00;
+  --djx-dark: #1a1a1a;
+  --djx-darker: #000000;
+  --djx-gray: #262626;
+  --djx-light-gray: #cccccc;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    )
+    fixed;
+  @apply bg-djx-dark text-white;
+}
+
+@layer components {
+  .story-button {
+    @apply bg-djx-yellow text-black font-bold py-3 px-6 rounded-lg 
+           transition-all duration-300 hover:bg-opacity-90 
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .choice-button {
+    @apply w-full flex items-center justify-between
+           bg-transparent text-djx-yellow border-2 border-djx-yellow/50
+           hover:border-djx-yellow hover:bg-djx-yellow/10
+           py-3 px-6 rounded-lg transition-all duration-300
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+}
