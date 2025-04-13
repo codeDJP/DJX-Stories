@@ -8,6 +8,8 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   swcMinify: true,
+  output: 'standalone',
+  poweredByHeader: false
 }
 
 module.exports = nextConfig

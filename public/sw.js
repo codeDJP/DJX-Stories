@@ -15,6 +15,11 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Don't cache API requests
+  if (event.request.url.includes('/api/')) {
+    return fetch(event.request);
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -27,8 +32,8 @@ self.addEventListener('fetch', (event) => {
         const fetchRequest = event.request.clone();
 
         return fetch(fetchRequest).then((response) => {
-          // Check if response is valid
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          // Don't cache non-successful responses or non-GET requests
+          if (!response || response.status !== 200 || event.request.method !== 'GET') {
             return response;
           }
 
@@ -40,6 +45,12 @@ self.addEventListener('fetch', (event) => {
           });
 
           return response;
+        }).catch(() => {
+          // If fetch fails, return the offline page for navigation requests
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+          return null;
         });
       })
   );
