@@ -210,7 +210,12 @@ export const useStory = () => {
       
       const storyText = data.candidates[0].content.parts[0].text;
       const choiceRegex = /\[(.*?)\]/g;
-      const extractedChoices = [...storyText.matchAll(choiceRegex)].map(match => match[1]);
+      const extractedChoices: string[] = [];
+      for (const match of Array.from(storyText.matchAll(choiceRegex))) {
+        if (match[1]) {
+          extractedChoices.push(match[1]);
+        }
+      }
       
       if (extractedChoices.length === 0) {
         throw new Error('No choices found in the story response');
