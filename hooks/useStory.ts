@@ -31,59 +31,47 @@ const RETRY_DELAY = 1000;
 const STORAGE_KEY = 'djx-story-state';
 
 export const useStory = () => {
-  // Initialize state from localStorage if available
-  const getInitialState = (): StoredState => {
-    if (typeof window === 'undefined') return {
-      prompt: '',
-      story: '',
-      choices: [],
-      previousChoices: [],
-      storyHistory: []
-    };
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (error) {
-        console.error('Error parsing stored state:', error);
-      }
-    }
-
-    return {
-      prompt: '',
-      story: '',
-      choices: [],
-      previousChoices: [],
-      storyHistory: []
-    };
-  };
-
-  const [prompt, setPrompt] = useState<string>(getInitialState().prompt);
-  const [story, setStory] = useState<string>(getInitialState().story);
-  const [choices, setChoices] = useState<string[]>(getInitialState().choices);
-  const [previousChoices, setPreviousChoices] = useState<string[]>(getInitialState().previousChoices);
+  // Initialize with empty state first
+  const [prompt, setPrompt] = useState<string>('');
+  const [story, setStory] = useState<string>('');
+  const [choices, setChoices] = useState<string[]>([]);
+  const [previousChoices, setPreviousChoices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [storyHistory, setStoryHistory] = useState<StorySegment[]>(getInitialState().storyHistory);
+  const [storyHistory, setStoryHistory] = useState<StorySegment[]>([]);
   const [isOffline, setIsOffline] = useState<boolean>(false);
 
   // Cache for story responses
   const storyCache = new Map<string, { text: string; choices: string[] }>();
   const rateLimit = useRef(rateLimiter());
 
+  // Hydrate state from localStorage after mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const state = JSON.parse(stored);
+        setPrompt(state.prompt);
+        setStory(state.story);
+        setChoices(state.choices);
+        setPreviousChoices(state.previousChoices);
+        setStoryHistory(state.storyHistory);
+      } catch (error) {
+        console.error('Error parsing stored state:', error);
+      }
+    }
+  }, []);
+
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const state: StoredState = {
-        prompt,
-        story,
-        choices,
-        previousChoices,
-        storyHistory
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    const state: StoredState = {
+      prompt,
+      story,
+      choices,
+      previousChoices,
+      storyHistory
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [prompt, story, choices, previousChoices, storyHistory]);
 
   // Check online status and update accordingly
